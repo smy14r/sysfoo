@@ -1,30 +1,47 @@
-pipeline{
-    agent any
-    
-    tools{
-        maven 'Maven 3.6.3'
+pipeline {
+  agent any
+  stages {
+    stage('build') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11-slim'
+        }
+
+      }
+      steps {
+        echo 'compile maven app'
+        sh 'mvn compile'
+      }
     }
-        
-    stages{
-        stage('build'){
-            steps{
-                echo 'compile maven app'
-                sh 'mvn compile'
-            }
+
+    stage('test') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11-slim'
         }
-            
-        stage('test'){
-            steps{
-                echo 'test maven app'
-                sh 'mvn clean test'
-            }
-        }
-                
-        stage('package'){
-            steps{
-                echo 'package maven app'
-                sh 'mvn package -DskipTests'
-            }
-        }
+
+      }
+      steps {
+        echo 'test maven app'
+        sh 'mvn clean test'
+      }
     }
+
+    stage('package') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11-slim'
+        }
+
+      }
+      steps {
+        echo 'package maven app'
+        sh 'mvn package -DskipTests'
+      }
+    }
+
+  }
+  tools {
+    maven 'Maven 3.6.3'
+  }
 }
